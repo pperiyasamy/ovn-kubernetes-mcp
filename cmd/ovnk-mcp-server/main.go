@@ -12,6 +12,7 @@ import (
 
 	mcp "github.com/modelcontextprotocol/go-sdk/mcp"
 	kubernetesmcp "github.com/ovn-kubernetes/ovn-kubernetes-mcp/pkg/kubernetes/mcp"
+	ovsmcp "github.com/ovn-kubernetes/ovn-kubernetes-mcp/pkg/ovs/mcp"
 )
 
 type MCPServerConfig struct {
@@ -36,6 +37,12 @@ func main() {
 		}
 		log.Println("Adding Kubernetes tools to OVN-K MCP server")
 		k8sMcpServer.AddTools(ovnkMcpServer)
+		ovsServer, err := ovsmcp.NewMCPServer(k8sMcpServer)
+		if err != nil {
+			log.Fatalf("Failed to create OVS MCP server: %v", err)
+		}
+		log.Println("Adding OVS tools to OVN-K MCP server")
+		ovsServer.AddTools(ovnkMcpServer)
 	}
 
 	// Create a context that can be cancelled to shutdown the server.
